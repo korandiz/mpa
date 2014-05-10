@@ -123,7 +123,7 @@ func dct2(data *[2]float32) {
 	data[1] = odd
 }
 
-// dct32c contains the constants required by dct32.
+// dct32c contains the constants required by dct32 and idct32.
 // dct32c[i] = 0.5 / cos(π * (2*i + 1) / 64)
 var dct32c = [16]float32{
 	0.500602998235196,
@@ -144,7 +144,7 @@ var dct32c = [16]float32{
 	10.190008123548033,
 }
 
-// dct16c contains the constants required by dct16.
+// dct16c contains the constants required by dct16 and idct16.
 // dct16c[i] = 0.5 / cos(π * (2*i + 1) / 32)
 var dct16c = [8]float32{
 	0.502419286188156,
@@ -157,7 +157,7 @@ var dct16c = [8]float32{
 	5.101148618689155,
 }
 
-// dct8c contains the constants required by dct8.
+// dct8c contains the constants required by dct8 and idct8.
 // dct8c[i] = 0.5 / cos(π * (2*i + 1) / 16)
 var dct8c = [4]float32{
 	0.509795579104159,
@@ -166,13 +166,13 @@ var dct8c = [4]float32{
 	2.562915447741505,
 }
 
-// dct4c contains the constants required by dct4.
+// dct4c contains the constants required by dct4 and idct4.
 // dct4c[i] = 0.5 / cos(π * (2*i + 1) / 8)
 var dct4c = [2]float32{
 	0.541196100146197,
 	1.306562964876376,
 }
 
-// dct2c is the single constant required by dct2.
+// dct2c is the single constant required by dct2 and idct2.
 // dct2 = 0.5 / cos(π / 4)
 const dct2c = 0.707106781186547
