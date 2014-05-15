@@ -33,7 +33,7 @@ package mpa
 //
 
 // imdct36 computes the IMDCT for N = 36.
-func imdct36(in []float32, out []float32) {
+func imdct36(in, out []float32) {
 	var (
 		inA, inB, inC    [6]float32
 		outA, outB, outC [12]float32
@@ -64,7 +64,7 @@ func imdct36(in []float32, out []float32) {
 }
 
 // imdct12 computes the IMDCT for N = 12.
-func imdct12(in []float32, out []float32) {
+func imdct12(in, out []float32) {
 	var (
 		inA, inB, inC    [2]float32
 		outA, outB, outC [4]float32
@@ -104,79 +104,111 @@ func imdct4(in *[2]float32, out *[4]float32) {
 	out[3] = tmp1
 }
 
-// imdct36s contains some constants required by imdct36.
+// imdct36s contains some constants required by imdct36 and mdct36.
 // imdct36s[k] = sin(π * (2*k + 1) / 36)
-var imdct36s = [6]float32{
+var imdct36s = [12]float32{
 	0.0871557427476582,
 	0.2588190451025207,
 	0.4226182617406994,
 	0.5735764363510460,
 	0.7071067811865475,
 	0.8191520442889917,
+	0.9063077870366499,
+	0.9659258262890682,
+	0.9961946980917455,
+	0.9961946980917455,
+	0.9659258262890683,
+	0.9063077870366500,
 }
 
-// imdct36c contains some constants required by imdct36.
+// imdct36c contains some constants required by imdct36 and mdct36.
 // imdct36c[k] = cos(π * (2*k + 1) / 36)
-var imdct36c = [6]float32{
-	0.996194698091746,
-	0.965925826289068,
-	0.906307787036650,
-	0.819152044288992,
-	0.707106781186548,
-	0.573576436351046,
+var imdct36c = [12]float32{
+	0.9961946980917455,
+	0.9659258262890683,
+	0.9063077870366499,
+	0.8191520442889918,
+	0.7071067811865476,
+	0.5735764363510462,
+	0.4226182617406994,
+	0.2588190451025210,
+	0.0871557427476581,
+	-0.0871557427476580,
+	-0.2588190451025209,
+	-0.4226182617406993,
 }
 
-// imdct36s3 contains some constants required by imdct36.
+// imdct36s3 contains some constants required by imdct36 and mdct36.
 // imdct36s3[k] = sqrt(3) * sin(π * (2*k + 1) / 36)
-var imdct36s3 = [6]float32{
+var imdct36s3 = [12]float32{
 	0.150958174610347,
 	0.448287736084027,
 	0.731996301541334,
 	0.993463529784308,
 	1.224744871391589,
 	1.418812959832445,
+	1.569771134442792,
+	1.673032607475616,
+	1.725459831325642,
+	1.725459831325642,
+	1.673032607475616,
+	1.569771134442792,
 }
 
-// imdct36c3 contains some constants required by imdct36.
+// imdct36c3 contains some constants required by imdct36 and mdct36.
 // imdct36c3[k] = sqrt(3) * cos(π * (2*k + 1) / 36)
-var imdct36c3 = [6]float32{
+var imdct36c3 = [12]float32{
 	1.725459831325642,
 	1.673032607475616,
 	1.569771134442792,
 	1.418812959832445,
 	1.224744871391589,
 	0.993463529784308,
+	0.731996301541334,
+	0.448287736084027,
+	0.150958174610347,
+	-0.150958174610346,
+	-0.448287736084027,
+	-0.731996301541333,
 }
 
-// imdct12s contains some constants required by imdct12.
+// imdct12s contains some constants required by imdct12 and mdct12.
 // imdct12s[k] = sin(π * (2*k + 1) / 12)
-var imdct12s = [2]float32{
+var imdct12s = [4]float32{
 	0.258819045102521,
 	0.707106781186547,
+	0.965925826289068,
+	0.965925826289068,
 }
 
-// imdct12c contains some constants required by imdct12.
+// imdct12c contains some constants required by imdct12 and mdct12.
 // imdct12c[k] = cos(π * (2*k + 1) / 12)
-var imdct12c = [2]float32{
+var imdct12c = [4]float32{
 	0.965925826289068,
 	0.707106781186548,
+	0.258819045102521,
+	-0.258819045102521,
 }
 
-// imdct12s3 contains some constants required by imdct12.
+// imdct12s3 contains some constants required by imdct12 and mdct12.
 // imdct12s3[k] = sqrt(3) * sin(π * (2*k + 1) / 12)
-var imdct12s3 = [2]float32{
+var imdct12s3 = [4]float32{
 	0.448287736084027,
 	1.224744871391589,
+	1.673032607475616,
+	1.673032607475616,
 }
 
-// imdct12c3 contains some constants required by imdct12.
+// imdct12c3 contains some constants required by imdct12 and mdct12.
 // imdct12c3[k] = sqrt(3) * cos(π * (2*k + 1) / 12)
-var imdct12c3 = [2]float32{
-	1.67303260747562,
-	1.22474487139159,
+var imdct12c3 = [4]float32{
+	1.673032607475616,
+	1.224744871391589,
+	0.448287736084027,
+	-0.448287736084027,
 }
 
-// Constants required by imdct4.
+// Constants required by imdct4 and mdct4.
 const (
 	imdct4c0 = 0.382683432365090
 	imdct4c1 = -0.923879532511287
