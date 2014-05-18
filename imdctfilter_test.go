@@ -28,8 +28,8 @@ import (
 
 func TestImdctFilter(t *testing.T) {
 	for typ := 0; typ <= 3; typ++ {
-		in1, out1 := make([]float32, 18), make([]float32, 36)
-		in2, out2 := make([]float64, 18), make([]float64, 36)
+		in1, out1 := make([]float32, 18), make([]float32, 18)
+		in2, out2 := make([]float64, 18), make([]float64, 18)
 		f1, f2 := imdctFilter{}, directImdctFilter{}
 		rand.Seed(42)
 		max := 0.0
