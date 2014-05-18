@@ -459,7 +459,7 @@ var ca = [8]float32 {
 }
 
 // mdctWindows contains the precomputed values of the window functions used with
-// the MDCT filter.
+// the MDCT and IMDCT filters.
 var mdctWindows = [4][36]float32{
 	// Type 0 (normal)
 	{
