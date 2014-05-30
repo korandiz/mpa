@@ -53,6 +53,9 @@ func (rd *bitReader) refill() error {
 			// data, causing refill to fail as well. Or the error may just go
 			// away, which is okay, too.
 			rd.limit += n
+			if rd.limit > len(rd.buffer) {
+				rd.limit = len(rd.buffer)
+			}
 			return nil
 		} else if err != nil {
 			return err
