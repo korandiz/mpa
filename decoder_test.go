@@ -186,12 +186,10 @@ func loadHexFile(fn string, k int) ([]byte, error) {
 			}
 			data = append(data, byte(x&0xff))
 		}
-		if err != nil {
-			if err == io.EOF {
-				return data, nil
-			} else {
-				return nil, err
-			}
+		if err == io.EOF {
+			return data, nil
+		} else if err != nil {
+			return nil, err
 		}
 	}
 }
@@ -210,12 +208,10 @@ func loadPcmFile(fn string, nch int) ([2][]int32, error) {
 			if n != 0 {
 				data[ch] = append(data[ch], x)
 			}
-			if err != nil {
-				if err == io.EOF {
-					return data, nil
-				} else {
-					return data, err
-				}
+			if err == io.EOF {
+				return data, nil
+			} else if err != nil {
+				return data, err
 			}
 		}
 	}
@@ -421,7 +417,7 @@ func (r *junkReader) Read(p []byte) (int, error) {
 	r.n -= n
 	if n < len(p) {
 		return n, io.EOF
-	} else {
-		return n, nil
 	}
+
+	return n, nil
 }

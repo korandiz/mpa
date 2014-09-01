@@ -157,7 +157,7 @@ func (r *Reader) convert(samples *[2][1152]float32) {
 		for t := 0; t < nSamples; t++ {
 			s := (samples[inCh][t] + offset) * multiplier
 			if s >= max {
-				s -= 1
+				s--
 			}
 			var si int
 			if s < 0 {

@@ -63,10 +63,10 @@ func (v *directSynthesisFilter) filter(in, out *[32]float64) {
 
 	for i := 0; i <= 63; i++ {
 		v[i] = 0
-		i_fl := float64(i)
+		iFl := float64(i)
 		for k := 0; k <= 31; k++ {
-			k_fl := float64(k)
-			v[i] += math.Cos((16+i_fl)*(2*k_fl+1)*math.Pi/64.0) * float64(in[k])
+			kFl := float64(k)
+			v[i] += math.Cos((16+iFl)*(2*kFl+1)*math.Pi/64.0) * float64(in[k])
 		}
 	}
 

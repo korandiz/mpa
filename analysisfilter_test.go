@@ -78,11 +78,11 @@ func (x *directAnalysisFilter) filter(in, out *[32]float64) {
 	}
 
 	for i := 0; i <= 31; i++ {
-		i_fl := float64(i)
+		iFl := float64(i)
 		out[i] = 0
 		for k := 0; k <= 63; k++ {
-			k_fl := float64(k)
-			out[i] += y[k] * math.Cos((2*i_fl+1)*(k_fl-16)*math.Pi/64)
+			kFl := float64(k)
+			out[i] += y[k] * math.Cos((2*iFl+1)*(kFl-16)*math.Pi/64)
 		}
 	}
 }

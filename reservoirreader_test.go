@@ -85,7 +85,7 @@ func TestReservoir_loadUntilSyncword(t *testing.T) {
 				return
 			}
 			if d != i {
-				t.Error("i = %d, j = %d, read %d", i, j, d)
+				t.Errorf("i = %d, j = %d, read %d", i, j, d)
 				return
 			}
 		}

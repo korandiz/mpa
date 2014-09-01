@@ -55,13 +55,13 @@ func testIdct(t *testing.T, it idctTester) {
 }
 
 func directIdct(X []float32) []float64 {
-	N, N_fl := len(X), float64(len(X))
+	N, NFl := len(X), float64(len(X))
 	x := make([]float64, N)
 	for k := 0; k < N; k++ {
-		k_fl := float64(k)
+		kFl := float64(k)
 		for n := 0; n < N; n++ {
-			n_fl := float64(n)
-			x[k] += float64(X[n]) * math.Cos(math.Pi*(2*k_fl+1)*n_fl/(2*N_fl))
+			nFl := float64(n)
+			x[k] += float64(X[n]) * math.Cos(math.Pi*(2*kFl+1)*nFl/(2*NFl))
 		}
 	}
 	return x

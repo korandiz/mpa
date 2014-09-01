@@ -55,13 +55,13 @@ func testDct(t *testing.T, dt dctTester) {
 }
 
 func directDct(x []float32) []float64 {
-	N, N_fl := len(x), float64(len(x))
+	N, NFl := len(x), float64(len(x))
 	X := make([]float64, N)
 	for n := 0; n < N; n++ {
-		n_fl := float64(n)
+		nFl := float64(n)
 		for k := 0; k < N; k++ {
-			k_fl := float64(k)
-			X[n] += float64(x[k]) * math.Cos(math.Pi*(2*k_fl+1)*n_fl/(2*N_fl))
+			kFl := float64(k)
+			X[n] += float64(x[k]) * math.Cos(math.Pi*(2*kFl+1)*nFl/(2*NFl))
 		}
 	}
 	return X
