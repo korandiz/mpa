@@ -220,3 +220,33 @@ func TestBitreader_syncword3(t *testing.T) {
 		}
 	}
 }
+
+func TestBitreader_lookahead(t *testing.T) {
+	in := make([]byte, 8192)
+	for i := 0; i < 100; i++ {
+		in[5000+i] = byte(i)
+	}
+	r := &bitReader{input: bytes.NewReader(in)}
+
+	for i := 0; i < 1000; i++ {
+		r.readByte()
+	}
+	r.readBits(3)
+
+	for i := 0; i < 100; i++ {
+		val1 := uint32(i<<24 | (i+1)<<16 | (i+2)<<8 | (i + 3))
+		ok1 := 3999+i+3 < len(r.buffer)
+
+		val2, ok2 := r.lookahead(3999 + i)
+
+		if ok1 != ok2 {
+			t.Errorf("i = %d, expected %t, got %t", i, ok1, ok2)
+			return
+		}
+
+		if ok1 && val1 != val2 {
+			t.Errorf("i = %d, expected %.8x, got %.8x", i, val1, val2)
+			return
+		}
+	}
+}

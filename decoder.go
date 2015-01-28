@@ -254,9 +254,7 @@ func (d *Decoder) DecodeFrame() error {
 		return err
 	}
 
-	// Any ancillary data is ignored. In fact it's not even read out of the
-	// stream. Hopefully, it contains no false syncwords, so it will be
-	// discarded by the next call to findHeader.
+	// Any ancillary data is ignored.
 
 	d.synthetizeOutput()
 
@@ -268,22 +266,6 @@ func (d *Decoder) decodeHeader() error {
 	header, err := d.findHeader()
 	if err != nil {
 		return err
-	}
-
-	if header>>19&1 == 0 {
-		return MalformedStream("ID == 0")
-	}
-
-	if header>>17&3 == 0 {
-		return MalformedStream("layer == 00")
-	}
-
-	if header>>12&15 == 15 {
-		return MalformedStream("bitrate_index == 1111")
-	}
-
-	if header>>10&3 == 3 {
-		return MalformedStream("sampling_frequency == 11")
 	}
 
 	d.layer = 4 - (header>>17)&3
@@ -311,7 +293,9 @@ func (d *Decoder) decodeHeader() error {
 // header as an integer.
 func (d *Decoder) findHeader() (int, error) {
 	header := uint32(0)
+	consumed := 0
 
+retry:
 	for header&0xfff00000 != 0xfff00000 {
 		b, err := d.stream.readByte()
 		if err != nil {
@@ -323,10 +307,89 @@ func (d *Decoder) findHeader() (int, error) {
 			return 0, err
 		}
 
+		consumed++
 		header = header<<8 | uint32(b)
 	}
 
+	// Free format headers have a high false positive rate, so we only accept
+	// them under some fairly restricted circumstances.
+	ffAllowed := consumed == 4 || d.layer != 0 && d.bitrateIndex == 0
+
+	if !d.trueHeader(header, ffAllowed) {
+		header &^= 0xff << 24
+		goto retry
+	}
+
 	return int(header), nil
+}
+
+// trueHeader tries to determine if the suspected frame header just found is a
+// real one. If ffAllowed is false, all free format headers are considered fake.
+func (d *Decoder) trueHeader(header uint32, ffAllowed bool) bool {
+	valid, size1 := validateHeader(header)
+	if !valid {
+		return false
+	}
+
+	if size1 == 0 {
+		// We don't know where to look for the next frame as this is a free
+		// format header. The decision whether to accept it is left to the
+		// caller:
+		return ffAllowed
+	}
+
+	header, ok := d.stream.lookahead(size1 - 4)
+	if !ok {
+		// The stream is about to end anyway...
+		return true
+	}
+
+	valid, size2 := validateHeader(header)
+	if !valid || size2 == 0 {
+		return false
+	}
+
+	header, ok = d.stream.lookahead(size1 - 4 + size2)
+	if !ok {
+		return true
+	}
+
+	valid, size3 := validateHeader(header)
+	return valid && size3 != 0
+}
+
+// validateHeader determines if the parameter is a (syntactically) valid frame
+// header, and, if so, it also computes the frame size. For free format frames,
+// the reported size is 0.
+func validateHeader(header uint32) (valid bool, size int) {
+	var (
+		sync  = (header >> 20) & 0xfff
+		id    = (header >> 19) & 1
+		layer = 4 - (header>>17)&3
+		br    = (header >> 12) & 15
+		sf    = (header >> 10) & 3
+		pad   = (header >> 9) & 1
+	)
+
+	if sync != 0xfff || id == 0 || layer == 4 || br == 15 || sf == 3 {
+		return false, 0
+	}
+
+	if br == 0 { // free format
+		return true, 0
+	}
+
+	size = 12 * bitrateBps[layer][br]
+	if layer != 1 {
+		size *= 12
+	}
+	size /= samplingFreqHz[sf]
+	size += int(pad)
+	if layer == 1 {
+		size *= 4
+	}
+
+	return true, size
 }
 
 // synthetizeOutput feeds the subband samples through the synthesis filterbank

@@ -24,6 +24,8 @@ import "io"
 
 // A bitReader wraps an io.Reader and allows its bits to be read one-by-one, in
 // MSB-first order.
+// The buffer must be large enough to hold two frames' worth of data, or
+// Decoder.trueHeader won't work properly.
 type bitReader struct {
 	input   io.Reader
 	buffer  [4096]byte
@@ -153,4 +155,21 @@ func (rd *bitReader) syncword3() bool {
 	}
 
 	return rd.buffer[rd.head] == 0xff && rd.buffer[rd.head+1]&0xfe == 0xfa
+}
+
+// lookahead returns the 32-bit word starting n bytes ahead of the current read
+// position.
+func (rd *bitReader) lookahead(n int) (uint32, bool) {
+	if rd.head+n+4 > rd.limit {
+		rd.refill()
+		if rd.head+n+4 > rd.limit {
+			return 0, false
+		}
+	}
+
+	var r uint32
+	for i := 0; i < 4; i++ {
+		r = r<<8 | uint32(rd.buffer[rd.head+n+i])
+	}
+	return r, true
 }
