@@ -310,19 +310,20 @@ func (d *Decoder) decodeHeader() error {
 // findHeader looks for the next syncword in the input stream and returns the
 // header as an integer.
 func (d *Decoder) findHeader() (int, error) {
-	var header uint32 = 0
+	header := uint32(0)
 
 	for header&0xfff00000 != 0xfff00000 {
-		if b, err := d.stream.readByte(); err != nil {
+		b, err := d.stream.readByte()
+		if err != nil {
 			if err == io.EOF {
 				if header&0xfff000 == 0xfff000 || header&0xfff0 == 0xfff0 {
 					err = io.ErrUnexpectedEOF
 				}
 			}
 			return 0, err
-		} else {
-			header = header<<8 | uint32(b)
 		}
+
+		header = header<<8 | uint32(b)
 	}
 
 	return int(header), nil
@@ -528,7 +529,7 @@ func (d *Decoder) decodeFrame2() error {
 func (d *Decoder) decodeAllocation2() error {
 	aTab := allocationTables[d.nChannels-1][d.samplingFreq][d.bitrateIndex]
 	if aTab == nil {
-		return MalformedStream("Illegal combination of bitrate and mode")
+		return MalformedStream("illegal combination of bitrate and mode")
 	}
 
 	for sb := 0; sb < 32; sb++ {
@@ -923,8 +924,8 @@ func (d *Decoder) decodeScalefactors3(gr, ch int) error {
 func (d *Decoder) decodeHuffmanData3(gr, ch int) error {
 	var (
 		regions [3]int
-		N       int
-		bits    int = d.part23Length[gr][ch] - d.part2Length[gr][ch]
+		N       = 0
+		bits    = d.part23Length[gr][ch] - d.part2Length[gr][ch]
 	)
 
 	// Compute the region boundaries in the big_values partition
@@ -959,7 +960,7 @@ func (d *Decoder) decodeHuffmanData3(gr, ch int) error {
 
 		if htree == nil {
 			if d.tableSelect[gr][ch][r] != 0 {
-				return MalformedStream("Invalid table_select")
+				return MalformedStream("invalid table_select")
 			}
 			for ; N < regions[r]; N++ {
 				d.huffmanData[gr][ch][N] = 0

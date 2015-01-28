@@ -28,8 +28,8 @@ import (
 
 func TestImdctFilter(t *testing.T) {
 	for typ := 0; typ <= 3; typ++ {
-		in1, out1 := make([]float32, 18), make([]float32, 36)
-		in2, out2 := make([]float64, 18), make([]float64, 36)
+		in1, out1 := make([]float32, 18), make([]float32, 18)
+		in2, out2 := make([]float64, 18), make([]float64, 18)
 		f1, f2 := imdctFilter{}, directImdctFilter{}
 		rand.Seed(42)
 		max := 0.0
@@ -68,15 +68,15 @@ func (f *directImdctFilter) filter(X []float64, x []float64, typ int) {
 			var w float64
 			switch typ {
 			case 0:
-				w = math.Sin(math.Pi / 36 * (float64(i) + 0.5))
+				w = math.Sin(math.Pi / 36 * (iF + 0.5))
 			case 1:
 				switch {
 				case i <= 17:
-					w = math.Sin(math.Pi / 36 * (float64(i) + 0.5))
+					w = math.Sin(math.Pi / 36 * (iF + 0.5))
 				case i <= 23:
 					w = 1
 				case i <= 29:
-					w = math.Sin(math.Pi / 12 * (float64(i) - 17.5))
+					w = math.Sin(math.Pi / 12 * (iF - 17.5))
 				default:
 					w = 0
 				}
@@ -85,11 +85,11 @@ func (f *directImdctFilter) filter(X []float64, x []float64, typ int) {
 				case i <= 5:
 					w = 0
 				case i <= 11:
-					w = math.Sin(math.Pi / 12 * (float64(i) - 5.5))
+					w = math.Sin(math.Pi / 12 * (iF - 5.5))
 				case i <= 17:
 					w = 1
 				default:
-					w = math.Sin(math.Pi / 36 * (float64(i) + 0.5))
+					w = math.Sin(math.Pi / 36 * (iF + 0.5))
 				}
 			}
 			f.curr[i] = w * tmp[i]

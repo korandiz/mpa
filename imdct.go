@@ -33,7 +33,7 @@ package mpa
 //
 
 // imdct36 computes the IMDCT for N = 36.
-func imdct36(in []float32, out []float32) {
+func imdct36(in, out []float32) {
 	var (
 		inA, inB, inC    [6]float32
 		outA, outB, outC [12]float32
@@ -64,7 +64,7 @@ func imdct36(in []float32, out []float32) {
 }
 
 // imdct12 computes the IMDCT for N = 12.
-func imdct12(in []float32, out []float32) {
+func imdct12(in, out []float32) {
 	var (
 		inA, inB, inC    [2]float32
 		outA, outB, outC [4]float32

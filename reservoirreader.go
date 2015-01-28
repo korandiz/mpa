@@ -44,7 +44,7 @@ func (rd *reservoirReader) setSize(n int) error {
 	rd.bits = 0
 	rd.head = 0
 	if n > rd.limit {
-		return MalformedStream("Not enough main data")
+		return MalformedStream("not enough main data")
 	}
 	copy(rd.buffer[0:], rd.buffer[rd.limit-n:rd.limit])
 	rd.limit = n
@@ -87,7 +87,7 @@ func (rd *reservoirReader) loadUntilSyncword() error {
 		copy(rd.buffer[n:], tmp[:rd.limit])
 		rd.head, rd.limit = 0, len(rd.buffer)
 		if err == nil {
-			err = MalformedStream("Reservoir overflow")
+			err = MalformedStream("reservoir overflow")
 		}
 	}
 
@@ -105,7 +105,7 @@ func (rd *reservoirReader) readBits(n int) (int, error) {
 	for {
 		if bits == 0 {
 			if rd.head == rd.limit {
-				return 0, MalformedStream("Reservoir overread")
+				return 0, MalformedStream("reservoir overread")
 			}
 			bits, rd.current = 8, rd.buffer[rd.head]
 			rd.head++
@@ -135,7 +135,7 @@ func (rd *reservoirReader) readCode(tree huffmanTree) (int, error) {
 		if bits == 0 {
 			if rd.head == rd.limit {
 				rd.bits = 0
-				return 0, MalformedStream("Not enough Huffman data")
+				return 0, MalformedStream("not enough Huffman data")
 			}
 			bits, current = 8, rd.buffer[rd.head]
 			rd.head++
