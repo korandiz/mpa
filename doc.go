@@ -26,9 +26,10 @@
 //   package main
 //
 //   import (
-//       "github.com/korandiz/mpa"
 //       "io"
 //       "os"
+//
+//       "github.com/korandiz/mpa"
 //   )
 //
 //   func main() {
