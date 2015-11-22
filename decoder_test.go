@@ -374,20 +374,35 @@ func (f *fuzzer) Read(p []byte) (int, error) {
 	return n, err
 }
 
-func TestDecoder_junkTolerance(t *testing.T) {
+func TestDecoder_junkTolerance1(t *testing.T) {
+	testJunkTolerance(t, 1)
+}
+
+func TestDecoder_junkTolerance2(t *testing.T) {
+	testJunkTolerance(t, 2)
+}
+
+func TestDecoder_junkTolerance3(t *testing.T) {
+	testJunkTolerance(t, 3)
+}
+
+func testJunkTolerance(t *testing.T, layer int) {
 	// This test never explicitly fails. If it doesn't panic, it's okay.
 
-	N := 1 << 30
+	N := 1 << 28
 	if testing.Short() {
 		N = 1 << 23
 	}
 	rand.Seed(42)
-	d := &Decoder{Input: &junkReader{N}}
+	d := &Decoder{Input: &junkReader{n: N, layer: layer}}
+	succ := 0
 	tmp := make([]float32, 2000)
 	for n := 0; ; n++ {
 		err := d.DecodeFrame()
-		if _, ms := err.(MalformedStream); err != nil && !ms {
-			t.Logf("Decoder.DecodeFrame called %d times.", n)
+		if err == nil {
+			succ++
+		} else if _, ms := err.(MalformedStream); !ms {
+			t.Logf("Decoder.DecodeFrame succeeded %d out of %d times.", succ, n)
 			break
 		}
 		d.Bitrate()
@@ -405,14 +420,29 @@ func TestDecoder_junkTolerance(t *testing.T) {
 }
 
 type junkReader struct {
-	n int
+	n     int
+	cnt   int
+	layer int
 }
 
 func (r *junkReader) Read(p []byte) (int, error) {
+	fakeHdr := [4][4]byte{
+		{},
+		{0xff, 0xff, 0x90, 0x54},
+		{0xff, 0xfd, 0x90, 0x54},
+		{0xff, 0xfb, 0x90, 0x34},
+	}
+	frameSize := [4]int{0, 312, 522, 417}
+
 	n := 0
 	for n < len(p) && n < r.n {
-		p[n] = byte(rand.Int())
+		if r.cnt%frameSize[r.layer] < 4 {
+			p[n] = fakeHdr[r.layer][r.cnt%frameSize[r.layer]]
+		} else {
+			p[n] = byte(rand.Int())
+		}
 		n++
+		r.cnt++
 	}
 	r.n -= n
 	if n < len(p) {
